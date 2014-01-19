@@ -1,0 +1,25 @@
+setlocal enabledelayedexpansion
+
+
+for /l %%i in (1,1,9) do(
+
+	for /f "delims=" %%k in ('type %1\res\values\strings.xml') do (
+    
+	set str=%%k
+    
+	set str=!str:fuid=anqu0%%i!
+    
+	echo !str!>>%1\res\values\temp.xml
+	del %1\res\values\strings.xml
+	ren %1\res\values\temp.xml %1\res\values\strings.xml
+	
+)
+
+	echo 循环完成了
+
+	echo 当前文件夹apk的unpack包全部替换fuid后pack成渠道%%1包→→→→→
+	for /f "delims=" %%j in ('dir unpacked /b') do (
+	apktool b ".\unpacked\%%j" ".\packed\%%~nj_%%i.apk")
+)
+
+
