@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ApkChannels:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ApkChannels_jar</output-path>
+    <root id="archive" name="ApkChannels.jar">
+      <element id="module-output" name="ApkChannels" />
+    </root>
+  </artifact>
+</component>

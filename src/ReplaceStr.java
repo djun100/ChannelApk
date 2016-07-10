@@ -50,8 +50,10 @@ public class ReplaceStr {
 			System.out.println("请提供参数");
 			return;
 		}else{
-			if(args[0].equals("unpack")){
+			if(args[0].equals("unpack")) {
 				step1();//unpack
+			}else if (args[0].equals("pack")){
+				step2_pack();
 			}else if(args[0].equals("repstrings_pack")){
 				step2();//replace and pack
 			}else if(args[0].equals("repmanifest_pack")){
@@ -68,9 +70,10 @@ public class ReplaceStr {
 				System.out.println("参数不正确");
 				System.out.println("Options：");
 				System.out.println("unpack  						批量解包");
-				System.out.println("repstrings_pack  		批量替换strings.xml并初步打包");
-				System.out.println("repmanifest_pack  	批量替换Manifest.xml并初步打包");
-				System.out.println("repmanifest_IFLYOR_FUID_pack  							清理临时文件");
+				System.out.println("pack  							直接打包");
+				System.out.println("repstrings_pack  				批量替换strings.xml并初步打包");
+				System.out.println("repmanifest_pack  				批量替换Manifest.xml并初步打包");
+				System.out.println("repmanifest_IFLYOR_FUID_pack  	清理临时文件");
 				System.out.println("sign  							批量签名");
 				System.out.println("zipalign  						批量优化");
 				System.out.println("clear  							清理临时文件");
@@ -125,7 +128,9 @@ public class ReplaceStr {
 		String dir="apk";
 		List<String> strings= readFiles(dir);
 		for(String string : strings){
-			String temp="cmd /c apktool d \"apk\\"+string+"\" \"unpacked\\"+string.split("\\.")[0]+"\"";
+			//执行的cmd语句：cmd /c apktool d "apk\sourcebrowser1_0_0.apk" "unpacked\sourcebrowser1_0_0"
+//			String temp="cmd /c apktool d \"apk\\"+string+"\" \"unpacked\\"+string.split("\\.")[0]+"\"";
+			String temp=String.format("cmd /c apktool d %s -o %s","apk\\"+string,"unpacked\\"+string.split("\\.")[0]);
 			System.out.println("执行的cmd语句："+temp);
 			runbat(temp);			
 		}
@@ -157,7 +162,8 @@ public class ReplaceStr {
 			System.out.println("批量打包中→→→→→");
 			List<String> s_unpacks = readFiles("unpacked");
 			for (String string : s_unpacks) {
-				String temp = "cmd /c apktool b \"unpacked\\" + string + "\" \"packed\\" + string +channelPre+channel+channelLast+ ".apk\"";
+//				String temp = "cmd /c apktool b \"unpacked\\" + string + "\" \"packed\\" + string +channelPre+channel+channelLast+ ".apk\"";
+				String temp =String.format("cmd /c apktool b %s -o %s","unpacked\\"+ string,"packed\\"+ string +channelPre+channel+channelLast+ ".apk" );
 				System.out.println("执行的cmd语句：" + temp);
 				runbat(temp);
 			}
@@ -182,18 +188,26 @@ public class ReplaceStr {
 			List<String> stringss = readAbFiles(dirs);
 			for (String temp : stringss) {
 				File file = new File(temp + "\\AndroidManifest.xml");
+				System.out.println("文件路径："+file.getAbsolutePath());
+				System.out.println("文件是否存在："+file.exists());
 					//正则替换
 //				String regex="<string name=\"fuid\">(.*?)</string>";
-				String regex="<meta-data android:name=\"UMENG_CHANNEL\" android:value=\"(.*?)\" />";
+//				              <meta-data android:name="UMENG_CHANNEL" android:value="qudao005"/>
+				String regex="<meta-data android:name=\"UMENG_CHANNEL\" android:value=\"(.*?)\"(\\s*)/>";
 //				regularExp("", "<string name=\"fuid\">"+channelPre+channel+channelLast+"</string>", file);
-				System.out.println("替换成内容："+"<meta-data android:name=\"UMENG_CHANNEL\" android:value=\""+channelPre+channel+channelLast+"\" />");
-				regularExp(regex, "<meta-data android:name=\"UMENG_CHANNEL\" android:value=\""+channelPre+channel+channelLast+"\" />", file);
+				System.out.println("替换成内容："
+						+"<meta-data android:name=\"UMENG_CHANNEL\" android:value=\""
+						+channelPre+channel+channelLast+"\" />");
+
+				regularExp(regex, "<meta-data android:name=\"UMENG_CHANNEL\" android:value=\""
+						+channelPre+channel+channelLast+"\" />", file);
 //				<meta-data android:name="UMENG_CHANNEL" android:value="Original" />
 			}
 			System.out.println("批量打包中→→→→→");
 			List<String> s_unpacks = readFiles("unpacked");
 			for (String string : s_unpacks) {
-				String temp = "cmd /c apktool b \"unpacked\\" + string + "\" \"packed\\" + string +channelPre+channel+channelLast+ ".apk\"";
+//				String temp = "cmd /c apktool b \"unpacked\\" + string + "\" \"packed\\" + string +channelPre+channel+channelLast+ ".apk\"";
+				String temp =String.format("cmd /c apktool b %s -o %s","unpacked\\"+ string,"packed\\"+ string +channelPre+channel+channelLast+ ".apk" );
 				System.out.println("执行的cmd语句：" + temp);
 				runbat(temp);
 			}
@@ -229,10 +243,23 @@ public class ReplaceStr {
 			System.out.println("批量打包中→→→→→");
 			List<String> s_unpacks = readFiles("unpacked");
 			for (String string : s_unpacks) {
-				String temp = "cmd /c apktool b \"unpacked\\" + string + "\" \"packed\\" + string +channelPre+channel+channelLast+ ".apk\"";
+//				String temp = "cmd /c apktool b \"unpacked\\" + string + "\" \"packed\\" + string +channelPre+channel+channelLast+ ".apk\"";
+				String temp =String.format("cmd /c apktool b %s -o %s","unpacked\\"+ string,"packed\\"+ string +channelPre+channel+channelLast+ ".apk" );
 				System.out.println("执行的cmd语句：" + temp);
 				runbat(temp);
 			}
+		}
+	}
+
+	private static void step2_pack(){
+		System.out.println("第二步：直接打单包→→→→→");
+
+		List<String> s_unpacks = readFiles("unpacked");
+		for (String string : s_unpacks) {
+//				String temp = "cmd /c apktool b \"unpacked\\" + string + "\" \"packed\\" + string +channelPre+channel+channelLast+ ".apk\"";
+			String temp =String.format("cmd /c apktool b %s -o %s","unpacked\\"+ string,"packed\\"+ string +channelPre+channel+channelLast+ ".apk" );
+			System.out.println("执行的cmd语句：" + temp);
+			runbat(temp);
 		}
 	}
 
@@ -478,6 +505,7 @@ public class ReplaceStr {
 			    while (matcher.find()) {
 			    	System.out.println("替换后的group():"+matcher.group());			    	
 			    }
+
 			/*output:
 			href="http://***.***.*" onclick="co('**')" class="lr">***
 			*/
